@@ -17,7 +17,7 @@ const startServer = async () => {
     await connectDB();
 
     // Start Express HTTP Server only after successful DB connection
-    const server = app.listen(PORT, () => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(
         `[MediConnect Backend] Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`
       );

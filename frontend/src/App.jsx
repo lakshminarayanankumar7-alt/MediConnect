@@ -1,59 +1,74 @@
-import React, { useState } from 'react';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import Home from './pages/Home';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
+
+import Navbar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
+import ProtectedRoute from './components/common/ProtectedRoute';
+
+import Home from './pages/public/Home';
+import FindDoctors from './pages/public/FindDoctors';
+import DoctorDetails from './pages/public/DoctorDetails';
+
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+
+import PatientDashboard from './pages/patient/PatientDashboard';
+import DoctorDashboard from './pages/doctor/DoctorDashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 function App() {
-  const [noticeMessage, setNoticeMessage] = useState('');
-
-  const showNotice = (msg) => {
-    setNoticeMessage(msg);
-    setTimeout(() => {
-      setNoticeMessage((current) => (current === msg ? '' : current));
-    }, 4500);
-  };
-
   return (
-    <div className="min-h-screen flex flex-col bg-white text-main font-sans antialiased">
-      {/* Non-blocking Notice Banner */}
-      {noticeMessage && (
-        <aside
-          className="sticky top-0 z-50 bg-primary-hover text-white px-4 py-2.5 shadow-md animate-slide-down flex items-center justify-between"
-          role="alert"
-        >
-          <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 text-sm font-medium">
-              <svg
-                className="w-5 h-5 shrink-0 text-cyan-200"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-              </svg>
-              <span>{noticeMessage}</span>
-            </div>
-            <button
-              type="button"
-              className="text-white/80 hover:text-white p-1 rounded-md text-xl leading-none transition-colors cursor-pointer"
-              onClick={() => setNoticeMessage('')}
-              aria-label="Close notification"
-            >
-              &times;
-            </button>
-          </div>
-        </aside>
-      )}
+    <BrowserRouter>
+      <AuthProvider>
+        <NotificationProvider>
+          <div className="min-h-screen flex flex-col bg-white text-main font-sans antialiased selection:bg-primary/20 selection:text-primary">
+            <Navbar />
+            <main className="flex-1">
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/doctors" element={<FindDoctors />} />
+                <Route path="/doctors/:id" element={<DoctorDetails />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
-      <Navbar onNotice={showNotice} />
-      <div className="flex-1">
-        <Home onNotice={showNotice} />
-      </div>
-      <Footer onNotice={showNotice} />
-    </div>
+                {/* Role-Protected Dashboards */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute allowedRoles={['patient']}>
+                      <PatientDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/doctor/dashboard"
+                  element={
+                    <ProtectedRoute allowedRoles={['doctor']}>
+                      <DoctorDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/dashboard"
+                  element={
+                    <ProtectedRoute allowedRoles={['admin']}>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Fallback */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </NotificationProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
