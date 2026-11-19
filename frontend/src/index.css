@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0284c7;
+  --color-primary-hover: #0369a1;
+  --color-teal: #0d9488;
+  --color-teal-hover: #0f766e;
+  --color-bg-light: #f0f9ff;
+  --color-main: #0f172a;
+  --color-secondary: #64748b;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.25s ease-out forwards;
+}
